@@ -1,4 +1,6 @@
 import 'package:spark/consts/consts.dart';
+import 'package:spark/controller/auth_controller.dart';
+import 'package:spark/views/home_screen/home.dart';
 import 'package:spark/widgets_common/appLogo_widget.dart';
 import 'package:spark/widgets_common/bg_widget.dart';
 import 'package:spark/widgets_common/custom_textfield.dart';
@@ -13,6 +15,12 @@ class SignUp extends StatefulWidget {
 
 class _SignUpState extends State<SignUp> {
   bool? ischeck = false;
+  var controller = Get.put(AuthController());
+
+  var nameControler = TextEditingController();
+  var emailControler = TextEditingController();
+  var passwordControler = TextEditingController();
+  var retypepasswordControler = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -29,10 +37,18 @@ class _SignUpState extends State<SignUp> {
             3.heightBox,
             Column(
               children: [
-                customTextField(hint: nameHint, title: name),
-                customTextField(hint: emailHint, title: email),
-                customTextField(hint: passwordHint, title: pasword),
-                customTextField(hint: passwordHint, title: retypePassword),
+                customTextField(
+                    hint: nameHint, title: name, controller: nameControler),
+                customTextField(
+                    hint: emailHint, title: email, controller: emailControler),
+                customTextField(
+                    hint: passwordHint,
+                    title: pasword,
+                    controller: passwordControler),
+                customTextField(
+                    hint: passwordHint,
+                    title: retypePassword,
+                    controller: retypepasswordControler),
                 Align(
                     alignment: Alignment.centerRight,
                     child: TextButton(
@@ -84,13 +100,33 @@ class _SignUpState extends State<SignUp> {
                   ],
                 ),
                 ourButton(
-                        color: ischeck == true ? maganta : lightGrey,
-                        title: signup,
-                        textColor: whiteColor,
-                        onPress: () {})
-                    .box
-                    .width(context.screenWidth - 50)
-                    .make(),
+                    color: ischeck == true ? maganta : lightGrey,
+                    title: signup,
+                    textColor: whiteColor,
+                    onPress: () async {
+                      if (ischeck != false) {
+                        try {
+                          await controller
+                              .signupMethod(
+                            context: context,
+                            email: emailControler.text,
+                            password: passwordControler.text,
+                          )
+                              .then((value) {
+                            return controller.storeUserData(
+                                name: nameControler.text,
+                                email: emailControler.text,
+                                password: passwordControler.text);
+                          }).then((value) {
+                            VxToast.show(context, msg: loggedin);
+                            Get.offAll(() => Home());
+                          });
+                        } catch (e) {
+                          auth.signOut();
+                          VxToast.show(context, msg: e.toString());
+                        }
+                      }
+                    }).box.width(context.screenWidth - 50).make(),
                 5.heightBox,
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,

@@ -11,6 +11,7 @@ Widget customTextField({
       title!.text.color(maganta).fontFamily(semibold).size(16).make(),
       5.heightBox,
       TextFormField(
+        controller: controller,
         decoration: InputDecoration(
           hintStyle: TextStyle(
             fontFamily: semibold,
